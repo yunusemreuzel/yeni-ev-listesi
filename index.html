@@ -3,49 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yeni Ev Listemiz 🏠</title>
+    <title>Yeni Ev Planı & Borç Takibi 🏠</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-slate-50 min-h-screen p-4 font-sans text-gray-800">
-    <div class="max-w-md mx-auto bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-        <div class="bg-blue-600 p-6 text-white text-center">
-            <h1 class="text-2xl font-bold italic">Taşınma Günlüğü</h1>
-            <p class="text-blue-100 text-sm mt-1">Her şey kontrol altında bro!</p>
-        </div>
+<body class="bg-slate-50 min-h-screen font-sans text-gray-800 pb-10">
 
-        <div class="p-6 space-y-4">
-            <input type="text" id="taskInput" placeholder="Ne yapılacak?" 
-                   class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
-            
-            <div class="flex space-x-2">
-                <select id="categorySelect" class="flex-1 p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm">
-                    <option value="oncesi">📦 Taşınma Öncesi</option>
-                    <option value="sonrasi">🚛 Taşınma Sonrası</option>
-                </select>
-                <button onclick="addTask()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 active:scale-95 transition">
-                    EKLE
-                </button>
+    <div class="sticky top-0 z-50 bg-white shadow-md border-b">
+        <div class="max-w-md mx-auto p-4 space-y-3">
+            <div class="flex justify-between items-center">
+                <h1 class="text-lg font-black text-blue-700 uppercase tracking-tighter">
+                    <i class="fas fa-wallet mr-1"></i> Ev Yönetimi
+                </h1>
+                <div class="text-right">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase">Toplam Borç</p>
+                    <p id="totalDebt" class="text-xl font-black text-red-600">0.00 TL</p>
+                </div>
+            </div>
+            <div class="bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                <div id="progressBar" class="bg-blue-500 h-full transition-all duration-700" style="width: 0%"></div>
             </div>
         </div>
+    </div>
 
-        <div class="px-6 pb-8 space-y-6">
+    <div class="max-w-md mx-auto p-4 space-y-6">
+        
+        <div class="bg-white p-5 rounded-3xl shadow-xl border border-gray-100 space-y-4">
+            <div class="space-y-2">
+                <label class="text-[11px] font-bold text-gray-400 ml-1 uppercase">Açıklama & Tutar</label>
+                <div class="flex gap-2">
+                    <input type="text" id="taskInput" placeholder="Ne yapılacak / Borç nedir?" 
+                           class="flex-[2] p-3 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 transition font-medium">
+                    <input type="number" id="priceInput" placeholder="₺" 
+                           class="flex-1 p-3 bg-blue-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold text-blue-700">
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2">
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold text-gray-400 ml-1 uppercase">Kayıt Tipi</label>
+                    <select id="typeSelect" onchange="toggleCategory()" class="w-full p-3 bg-gray-50 border-0 rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500">
+                        <option value="gorev">✅ YAPILACAK İŞ</option>
+                        <option value="borc">💸 SADECE BORÇ</option>
+                    </select>
+                </div>
+                <div class="space-y-1" id="catArea">
+                    <label class="text-[11px] font-bold text-gray-400 ml-1 uppercase">Kategori</label>
+                    <select id="categorySelect" class="w-full p-3 bg-gray-50 border-0 rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500">
+                        <option value="oncesi">📦 TAŞINMA ÖNCESİ</option>
+                        <option value="sonrasi">🚛 TAŞINMA SONRASI</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <select id="userSelect" class="p-3 bg-gray-50 border-0 rounded-xl text-xs font-bold">
+                    <option value="Emre">👤 Emre</option>
+                    <option value="Eşim">👩 Eşim</option>
+                </select>
+                <select id="prioritySelect" class="p-3 bg-gray-50 border-0 rounded-xl text-xs font-bold">
+                    <option value="normal">🟡 Normal</option>
+                    <option value="acil">🔴 ACİL</option>
+                    <option value="vakitvar">🟢 Vakit Var</option>
+                </select>
+            </div>
+
+            <button onclick="addTask()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black hover:bg-blue-700 active:scale-95 transition shadow-lg shadow-blue-100 flex items-center justify-center gap-2">
+                <i class="fas fa-plus-circle"></i> LİSTEYE EKLE
+            </button>
+        </div>
+
+        <div class="space-y-8">
             <section>
-                <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Taşınma Öncesi İşler</h2>
-                <ul id="list-oncesi" class="space-y-3"></ul>
+                <h2 class="font-black text-gray-800 mb-4 px-2 flex items-center gap-2 text-sm uppercase tracking-tighter">
+                    <i class="fas fa-hand-holding-dollar text-red-500"></i> Genel Borçlar
+                </h2>
+                <ul id="list-borclar" class="space-y-3"></ul>
             </section>
 
             <section>
-                <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Taşınma Sonrası İşler</h2>
-                <ul id="list-sonrasi" class="space-y-3"></ul>
+                <h2 class="font-black text-gray-800 mb-4 px-2 flex items-center gap-2 text-sm uppercase tracking-tighter">
+                    <i class="fas fa-tasks text-blue-500"></i> Taşınma Görevleri
+                </h2>
+                <ul id="list-gorevler" class="space-y-3"></ul>
             </section>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, updateDoc, doc, deleteDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Senin verdiğin güncel config
         const firebaseConfig = {
             apiKey: "AIzaSyAdMfObhNZRF6Mi-N0hWbOcNGwkpqHH_Vs",
             authDomain: "liste-6f2fa.firebaseapp.com",
@@ -60,64 +108,88 @@
         const db = getFirestore(app);
         const tasksCol = collection(db, "yapilacaklar");
 
+        window.toggleCategory = () => {
+            const type = document.getElementById('typeSelect').value;
+            document.getElementById('catArea').style.opacity = type === 'borc' ? '0.3' : '1';
+        };
+
         window.addTask = async () => {
             const input = document.getElementById('taskInput');
+            const price = document.getElementById('priceInput');
             const category = document.getElementById('categorySelect').value;
-            
+            const type = document.getElementById('typeSelect').value;
+            const user = document.getElementById('userSelect').value;
+            const priority = document.getElementById('prioritySelect').value;
+
             if (input.value.trim() !== "") {
                 try {
                     await addDoc(tasksCol, {
                         text: input.value,
-                        category: category,
+                        price: parseFloat(price.value) || 0,
+                        type: type,
+                        category: type === 'borc' ? 'genel' : category,
+                        user: user,
+                        priority: priority,
                         completed: false,
                         createdAt: Date.now()
                     });
-                    input.value = "";
-                } catch (e) {
-                    alert("Veri eklenemedi: " + e.message);
-                }
+                    input.value = ""; price.value = "";
+                } catch (e) { console.error(e); }
             }
         };
 
         const q = query(tasksCol, orderBy("createdAt", "desc"));
         onSnapshot(q, (snapshot) => {
-            const listOncesi = document.getElementById('list-oncesi');
-            const listSonrasi = document.getElementById('list-sonrasi');
-            listOncesi.innerHTML = "";
-            listSonrasi.innerHTML = "";
+            const listBorclar = document.getElementById('list-borclar');
+            const listGorevler = document.getElementById('list-gorevler');
+            listBorclar.innerHTML = ""; listGorevler.innerHTML = "";
+
+            let totalDebt = 0, totalCount = 0, completedCount = 0;
 
             snapshot.forEach((docSnap) => {
-                const task = docSnap.data();
+                const item = docSnap.data();
                 const id = docSnap.id;
                 
+                totalDebt += (item.price || 0);
+                if(item.type === 'gorev') {
+                    totalCount++;
+                    if(item.completed) completedCount++;
+                }
+
                 const li = document.createElement('li');
-                li.className = `flex items-center justify-between p-4 rounded-xl border transition-all ${task.completed ? 'bg-gray-50 border-gray-100' : 'bg-white border-gray-200 shadow-sm'}`;
+                li.className = `p-4 rounded-2xl border transition-all ${item.completed ? 'bg-gray-50 border-gray-100 opacity-60' : 'bg-white border-gray-100 shadow-sm'}`;
+                
+                const priceBadge = item.price > 0 ? `<span class="bg-red-50 text-red-600 px-2 py-1 rounded-lg text-[11px] font-black">${item.price.toLocaleString('tr-TR')} TL</span>` : '';
+                const categoryLabel = item.type === 'gorev' ? (item.category === 'oncesi' ? '📦 ÖNCE' : '🚛 SONRA') : '💸 BORÇ';
+
                 li.innerHTML = `
-                    <div class="flex items-center space-x-3 flex-1 cursor-pointer" onclick="toggleTask('${id}', ${task.completed})">
-                        <div class="w-6 h-6 border-2 rounded-full flex items-center justify-center ${task.completed ? 'bg-green-500 border-green-500' : 'border-gray-300'}">
-                            ${task.completed ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
+                    <div class="flex items-start gap-3">
+                        <div onclick="toggleTask('${id}', ${item.completed})" class="mt-1 w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center cursor-pointer ${item.completed ? 'bg-green-500 border-green-500' : 'bg-white border-gray-300'}">
+                            ${item.completed ? '<i class="fas fa-check text-white text-[10px]"></i>' : ''}
                         </div>
-                        <span class="${task.completed ? 'line-through text-gray-400' : 'text-gray-700 font-medium'}">${task.text}</span>
+                        <div class="flex-1" onclick="toggleTask('${id}', ${item.completed})">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">${categoryLabel}</span>
+                                ${priceBadge}
+                                <span class="ml-auto text-[9px] font-bold text-blue-400 uppercase"><i class="far fa-user"></i> ${item.user}</span>
+                            </div>
+                            <p class="text-[14px] ${item.completed ? 'line-through text-gray-400' : 'text-gray-800 font-bold'}">${item.text}</p>
+                        </div>
+                        <button onclick="deleteTask('${id}')" class="text-gray-200 hover:text-red-500 p-1"><i class="far fa-trash-can"></i></button>
                     </div>
-                    <button onclick="deleteTask('${id}')" class="ml-2 text-gray-300 hover:text-red-500 p-1">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    </button>
                 `;
 
-                if (task.category === "oncesi") listOncesi.appendChild(li);
-                else listSonrasi.appendChild(li);
+                if (item.type === 'borc') listBorclar.appendChild(li);
+                else listGorevler.appendChild(li);
             });
+
+            document.getElementById('totalDebt').innerText = totalDebt.toLocaleString('tr-TR') + " TL";
+            const percent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+            document.getElementById('progressBar').style.width = percent + "%";
         });
 
-        window.toggleTask = async (id, currentStatus) => {
-            await updateDoc(doc(db, "yapilacaklar", id), { completed: !currentStatus });
-        };
-
-        window.deleteTask = async (id) => {
-            if(confirm("Bu görevi siliyorum?")) {
-                await deleteDoc(doc(db, "yapilacaklar", id));
-            }
-        };
+        window.toggleTask = async (id, status) => { await updateDoc(doc(db, "yapilacaklar", id), { completed: !status }); };
+        window.deleteTask = async (id) => { if(confirm("Siliyorum bro?")) await deleteDoc(doc(db, "yapilacaklar", id)); };
     </script>
 </body>
 </html>
